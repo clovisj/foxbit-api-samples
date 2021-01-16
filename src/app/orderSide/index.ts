@@ -5,4 +5,6 @@ enum OrderSide {
     , Unknown = 3 // error condition
 }
 
-export default OrderSide
+export {
+    OrderSide
+}

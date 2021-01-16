@@ -6,4 +6,6 @@ enum OrderTimeInForce {
     , FOK = 4 // fill or kill — fill the order immediately, or cancel it immediately
 }
 
-export default OrderTimeInForce
+export {
+    OrderTimeInForce
+}

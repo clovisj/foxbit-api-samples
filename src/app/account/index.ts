@@ -1,67 +1,71 @@
 import WS from '../ws'
-import Instrument from './id';
 
-class InstrumentService {
-    async list() {
+class AccountService {
+    async positions() {
         const {
-            OMSId
+            AccountId
+            , OMSId
+        } = WS.user;
+
+        const payload = {
+            AccountId
+            , OMSId
+        }
+
+        const request = {
+            m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
+            i: 0,		//Sequence Number
+            n: "GetAccountPositions",
+            o: payload
+        }
+
+        const res = await WS.send(request)
+        return res
+    }
+    async trades() {
+        const {
+            AccountId
+            , OMSId
+        } = WS.user;
+
+        const payload = {
+            AccountId
+            , OMSId
+            , StartIndex: 0
+        };
+
+        const request = {
+            m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
+            i: 0,		//Sequence Number
+            n: "GetAccountTrades",
+            o: payload
+        }
+
+        const res = await WS.send(request)
+        return res
+    }
+    async fees() {
+        const {
+            AccountId
+            , OMSId
         } = WS.user
 
         const payload = {
-            OMSId
-        }
+            AccountId
+            , OMSId
+            , StartIndex: 0
+        };
 
         const request = {
             m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
             i: 0,		//Sequence Number
-            n: "GetInstruments",
+            n: "GetAccountFees",
             o: payload
         }
 
         const res = await WS.send(request)
         return res
     }
-    async status(id: Instrument) {
-        const res = await this.subscribeLevel1(id)
-        this.unsubscribeLevel1(id)
-        return res
-    }
-    private async subscribeLevel1(id: Instrument) {
-        const payload = {
-            "OMSId": 1,
-            "InstrumentId": id
-        };
-
-        const request = {
-            m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
-            i: 0,		//Sequence Number
-            n: "SubscribeLevel1",
-            o: payload
-        }
-
-        const res = await WS.send(request)
-        this.unsubscribeLevel1(id)
-        return res
-    }
-    private unsubscribeLevel1(id: Instrument) {
-        const payload = {
-            "OMSId": 1,
-            "InstrumentId": id
-        };
-
-        const request = {
-            m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
-            i: 0,		//Sequence Number
-            n: "UnsubscribeLevel1",
-            o: payload
-        }
-
-        WS.send(request, false)
-    }
 }
 
-export {
-    Instrument
-}
-
-export default new InstrumentService()
+export default new AccountService()

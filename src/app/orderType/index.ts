@@ -8,4 +8,6 @@ enum OrderType {
     , BlockTrade = 7
 }
 
-export default OrderType
+export {
+    OrderType
+}

@@ -6,4 +6,6 @@ enum OrderPegPriceType {
     , Midpoint = 4
 }
 
-export default OrderPegPriceType
+export {
+    OrderPegPriceType
+}
