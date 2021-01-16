@@ -4,6 +4,13 @@ import * as crypto from "crypto";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+import OrderType from './orderType'
+import OrderSide from './orderSide'
+import OrderPegPriceType from './orderPegPriceType';
+import OrderTimeInForce from './orderTimeInForce';
+import Instrument from './instrument';
+import Product from './product';
+
 const {
     WS_URL
     , KEY
@@ -56,10 +63,6 @@ class App {
 
     private async onOpen() {
         console.log('WS-connected');
-        // this.getProducts()
-        // this.getInstruments()
-        // this.getL2Snapshot()
-
         // this.authManual('test@gmail.com', '123');
         // this.auth2FA('567502')
         this.auth();
@@ -255,7 +258,7 @@ class App {
         await this.waitReceive()
         return this.msg
     }
-    async getOrderFee(instrumentId: number, productId: number, amount: number, price: number) {
+    async getOrderFee(instrumentId: Instrument, productId: Product, amount: number, price: number) {
         const {
             AccountId
             , OMSId
@@ -265,10 +268,10 @@ class App {
             AccountId
             , OMSId
             , InstrumentId: instrumentId
-            // , ProductId: productId
+            , ProductId: productId
             , Amount: amount
             , Price: price
-            , OrderType: "Market" //Unknown,Market,Limit,StopMarket,StopLimit,TrailingStopMarket,TrailingStopLimit,BlockTrade
+            , OrderType: OrderType.Market
             // , MakerTaker: "Unknown" //Unknown,Maker,Taker
         }
 
@@ -283,7 +286,7 @@ class App {
         await this.waitReceive()
         return this.msg
     }
-    async sendOrder(instrumentId: number, amount: number, side: number = 1) {
+    async sendOrder(instrumentId: Instrument, quantity: number, price: number, type:OrderType, side: OrderSide = OrderSide.Buy) {
         const {
             AccountId
             , OMSId
@@ -292,26 +295,49 @@ class App {
         const payload = {
             AccountId
             , OMSId
-            , ClientOrderId: 0
-            , Quantity: amount
+            // , ClientOrderId: 0 // 
+            , Quantity: quantity
             , DisplayQuantity: 0
-            , UseDisplayQuantity: true
-            , LimitPrice: 0
+            , UseDisplayQuantity: false
+            , LimitPrice: price
             , OrderIdOCO: 0
-            , OrderType: 1     //ORDEM A MERCADO = 1
-            , PegPriceType: 1
+            , OrderType: type
+            , PegPriceType: OrderPegPriceType.Last
             , InstrumentId: instrumentId
             , TrailingAmount: 1.0
             , LimitOffset: 2.0
             , Side: side
-            , StopPrice: 0
-            , TimeInForce: 1
+            , StopPrice: price
+            , TimeInForce: OrderTimeInForce.GTC
         }
 
         const request = {
             m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
             i: 0,		//Sequence Number
             n: "SendOrder",
+            o: JSON.stringify(payload)
+        }
+
+        this.send(request)
+        await this.waitReceive()
+        return this.msg
+    }
+    async cancelOrder(id: number) {
+        const {
+            AccountId
+            , OMSId
+        } = this.user;
+
+        const payload = {
+            AccountId
+            , OMSId
+            , OrderId: id
+        }
+
+        const request = {
+            m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
+            i: 0,		//Sequence Number
+            n: "CancelOrder",
             o: JSON.stringify(payload)
         }
 
@@ -350,7 +376,7 @@ class App {
 
         this.send(request);
     }
-    async subscribeLevel1(instrument: number) {
+    async subscribeLevel1(instrument: Instrument) {
         const payload = {
             "OMSId": 1,
             "InstrumentId": instrument
@@ -369,7 +395,7 @@ class App {
         this.unsubscribeLevel1(instrument)
         return msg
     }
-    unsubscribeLevel1(instrument: number) {
+    unsubscribeLevel1(instrument: Instrument) {
         const payload = {
             "OMSId": 1,
             "InstrumentId": instrument
@@ -452,7 +478,7 @@ class App {
         await this.waitReceive()
         return this.msg
     }
-    async getDepositInfo(productId: number, generateNewKey: boolean = false) {
+    async getDepositInfo(productId: Product, generateNewKey: boolean = false) {
         const {
             AccountId
             , OMSId
@@ -476,7 +502,7 @@ class App {
         await this.waitReceive()
         return this.msg
     }
-    async getAllDepositRequestInfoTemplates(productId: number) {
+    async getAllDepositRequestInfoTemplates(productId: Product) {
         const {
             AccountId
             , OMSId

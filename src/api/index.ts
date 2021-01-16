@@ -37,8 +37,12 @@ api.get("/order/fee/:instrument/:product", async (req, res) => {
     res.status(200).json(data);
 });
 api.post("/order/:instrument", async (req, res) => {
-    const { amount } = req.body
-    const data = await App.sendOrder(+req.params.instrument, amount);
+    const { quantity, price, type } = req.body
+    const data = await App.sendOrder(+req.params.instrument, quantity, price, type);
+    res.status(200).json(data);
+});
+api.delete("/order/:id", async (req, res) => {
+    const data = await App.cancelOrder(+req.params.id);
     res.status(200).json(data);
 });
 api.get("/account/positions", async (req, res) => {
