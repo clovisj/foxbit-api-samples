@@ -322,6 +322,29 @@ class App {
         await this.waitReceive()
         return this.msg
     }
+    async getOrderStatus(id: number) {
+        const {
+            AccountId
+            , OMSId
+        } = this.user;
+
+        const payload = {
+            AccountId
+            , OMSId
+            , OrderId: id
+        }
+
+        const request = {
+            m: 0,		//MessageType ( 0_Request / 1_Reply / 2_Subscribe / 3_Event / 4_Unsubscribe / Error )
+            i: 0,		//Sequence Number
+            n: "GetOrderStatus",
+            o: JSON.stringify(payload)
+        }
+
+        this.send(request)
+        await this.waitReceive()
+        return this.msg
+    }
     async cancelOrder(id: number) {
         const {
             AccountId

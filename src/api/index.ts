@@ -36,6 +36,10 @@ api.get("/order/fee/:instrument/:product", async (req, res) => {
     const data = await App.getOrderFee(+req.params.instrument, +req.params.product, +(req.query.amount || 0), +(req.query.price || 0));
     res.status(200).json(data);
 });
+api.get("/order/:id", async (req, res) => {
+    const data = await App.getOrderStatus(+req.params.id);
+    res.status(200).json(data);
+});
 api.post("/order/:instrument", async (req, res) => {
     const { quantity, price, type } = req.body
     const data = await App.sendOrder(+req.params.instrument, quantity, price, type);
