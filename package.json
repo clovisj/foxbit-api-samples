@@ -12,6 +12,7 @@
   "author": "Clóvis Júnior (Juca)",
   "license": "MIT",
   "dependencies": {
+    "binance-api-node": "^0.10.44",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
