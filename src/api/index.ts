@@ -91,6 +91,14 @@ api.get("/binance/prices", async (req, res) => {
     const data = await BinanceService.prices()
     res.status(200).json(data)
 })
+api.get("/binance/account", async (req, res) => {
+    const data = await BinanceService.accountInfo()
+    res.status(200).json(data)
+})
+api.get("/binance/info", async (req, res) => {
+    const data = await BinanceService.exchangeInfo()
+    res.status(200).json(data)
+})
 api.get("/binance/:symbol/prices", async (req, res) => {
     const data = await BinanceService.prices(req.params.symbol)
     res.status(200).json(data)
@@ -104,6 +112,17 @@ api.get("/binance/:symbol/candles/:interval", async (req, res) => {
     const endTime = req.query.endTime ? +req.query.endTime : undefined
     const data = await BinanceService.candles(req.params.symbol, req.params.interval, startTime, endTime)
     res.status(200).json(data)
+})
+api.post("/binance/:symbol/buy", async (req, res) => {
+    const { quantity, price, type } = req.body
+    try {
+        const data = await BinanceService.buy(req.params.symbol, type, quantity, price)
+        res.status(200).json(data)
+    }
+    catch (err) {
+        console.error(err)
+        res.status(400).json(err)
+    }
 })
 
 api.listen(3000, () => {

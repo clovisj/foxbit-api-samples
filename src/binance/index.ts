@@ -1,10 +1,22 @@
-import BinanceApi, { Binance, CandleChartInterval, CandleChartResult, CandlesOptions, OrderBook } from 'binance-api-node'
+import BinanceApi, {
+    Binance
+    , CandleChartInterval
+    , CandleChartResult
+    , CandlesOptions
+    , OrderBook
+    , Account
+    , Order
+    , NewOrder
+    , OrderSide,
+    ExchangeInfo,
+    OrderType
+} from 'binance-api-node'
 import * as dotenv from "dotenv"
 dotenv.config()
 
 const {
     BINANCE_KEY
-    , BINANACE_SECRET
+    , BINANCE_SECRET
 } = process.env
 
 class BinanceWS {
@@ -13,8 +25,7 @@ class BinanceWS {
         // Authenticated client, can make signed calls
         this.client = BinanceApi({
             apiKey: `${BINANCE_KEY}`,
-            apiSecret: `${BINANACE_SECRET}`,
-            // getTime: xxx,
+            apiSecret: `${BINANCE_SECRET}`
         })
     }
 
@@ -43,6 +54,27 @@ class BinanceWS {
             payload.endTime = endTime
         }
         return await this.client.candles(payload)
+    }
+
+    async accountInfo(): Promise<Account> {
+        return await this.client.accountInfo()
+    }
+
+    async exchangeInfo(): Promise<ExchangeInfo> {
+        return await this.client.exchangeInfo()
+    }
+
+    async buy(symbol: string, type: string, quantity: number, price?: number): Promise<Order> {
+        const payload: NewOrder = {
+            side: 'BUY'
+            , type: type as OrderType
+            , symbol
+            , quantity: quantity.toString()
+        }
+        if (price) {
+            payload.price = price.toFixed(8)
+        }
+        return await this.client.orderTest(payload)
     }
 }
 
