@@ -110,7 +110,8 @@ api.get("/binance/:symbol/book", async (req, res) => {
 api.get("/binance/:symbol/candles/:interval", async (req, res) => {
     const startTime = req.query.startTime ? +req.query.startTime : undefined
     const endTime = req.query.endTime ? +req.query.endTime : undefined
-    const data = await BinanceService.candles(req.params.symbol, req.params.interval, startTime, endTime)
+    const limit = req.query.limit ? +req.query.limit : undefined
+    const data = await BinanceService.candles(req.params.symbol, req.params.interval, startTime, endTime, limit)
     res.status(200).json(data)
 })
 api.post("/binance/:symbol/buy", async (req, res) => {

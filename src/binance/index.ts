@@ -45,13 +45,16 @@ class BinanceWS {
         return await this.client.book({ symbol })
     }
 
-    async candles(symbol: string, interval: string, startTime?: number, endTime?: number): Promise<CandleChartResult[]> {
+    async candles(symbol: string, interval: string, startTime?: number, endTime?: number, limit?: number): Promise<CandleChartResult[]> {
         const payload: CandlesOptions = { symbol, interval: interval as CandleChartInterval }
         if (startTime) {
             payload.startTime = startTime
         }
         if (endTime) {
             payload.endTime = endTime
+        }
+        if (limit) {
+            payload.limit = limit
         }
         return await this.client.candles(payload)
     }
